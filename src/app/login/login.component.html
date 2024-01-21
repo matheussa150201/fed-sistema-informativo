@@ -1,42 +1,71 @@
 <p-messages [(value)]="msgs" class="message" styleClass="p-mr-2"></p-messages>
 <div class="logo-div">
-  <h2 class="row justify-content-center align-items-center full-height logo">Informativo</h2>
-  <h4 class="row justify-content-center align-items-center full-height logo">jobs</h4>
+  <h2 class="row justify-content-center align-items-center full-height logo">
+    Informativo
+  </h2>
+  <h4 class="row justify-content-center align-items-center full-height logo">
+    jobs
+  </h4>
 </div>
 
 <div class="container-fluid container-todo">
   <div class="row justify-content-center align-items-center full-height">
     <div class="col-md-3">
-      <div class="p-card p-card-w-title" style="padding: 20px;">
+      <div class="p-card p-card-w-title" style="padding: 20px">
         <h3 class="titulo font" *ngIf="!isCadastrar">Entre com a sua conta</h3>
         <h3 class="titulo font" *ngIf="isCadastrar">Criar sua conta</h3>
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
           <div class="p-fluid custom-input">
             <div class="p-field input label-info">
               <label for="login" class="font">Usuário:</label>
-              <input type="text" pInputText formControlName="login">
+              <input type="text" pInputText formControlName="login" />
             </div>
 
             <div class="p-field input label-info">
               <label for="password" class="font">Senha:</label>
-              <input type="password" pInputText formControlName="password">
+              <input type="password" pInputText formControlName="password" />
             </div>
 
             <div class="p-field input">
-              <button *ngIf="!isCadastrar" pButton type="submit"  class="p-button-help">Entrar</button>
-              <button *ngIf="isCadastrar" pButton type="submit"  class="p-button-help">Cadastrar</button>
+              <button
+                *ngIf="!isCadastrar"
+                pButton
+                type="submit"
+                class="p-button-help"
+              >
+                Entrar
+              </button>
+              <button
+                *ngIf="isCadastrar"
+                pButton
+                type="submit"
+                class="p-button-help"
+              >
+                Cadastrar
+              </button>
             </div>
-            
           </div>
         </form>
 
         <div class="p-text-center" *ngIf="!isCadastrar">
-          <p class="mb-0 font" style="font-weight: bolder;">Não tem conta? <a style="color: #6B21AB; font-weight: bolder;   cursor: pointer;
-            " (click)="cadastrar()">Cadastrar</a></p>
+          <p class="mb-0 font" style="font-weight: bolder">
+            Não tem conta?
+            <a
+              style="color: #6b21ab; font-weight: bolder; cursor: pointer"
+              (click)="cadastrar()"
+              >Cadastrar</a
+            >
+          </p>
         </div>
         <div class="p-text-center" *ngIf="isCadastrar">
-          <p class="mb-0 font" style="font-weight: bolder;">Já tem uma conta? <a style="color: #6B21AB; font-weight: bolder;   cursor: pointer;
-            " (click)="fazerLogin()">Fazer login</a></p>
+          <p class="mb-0 font" style="font-weight: bolder">
+            Já tem uma conta?
+            <a
+              style="color: #6b21ab; font-weight: bolder; cursor: pointer"
+              (click)="fazerLogin()"
+              >Fazer login</a
+            >
+          </p>
         </div>
       </div>
     </div>

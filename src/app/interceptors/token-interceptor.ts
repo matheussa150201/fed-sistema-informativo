@@ -50,7 +50,6 @@ export class TokenInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    // Lógica para renovar o token ou fazer logout
     this.authService.removeAccessToken();
     return throwError('Unauthorized');
   }

@@ -1,14 +1,20 @@
-import { ChangeDetectorRef, Component, HostListener, Inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  HostListener,
+  Inject,
+  OnInit,
+} from '@angular/core';
 import { HomeService } from './home.service';
 import { ImagemDTO, PublicacaoResponseDTO } from '../dto/PublicacaoResponseDTO';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng-lts/api';
 import { StorageService } from './storage.service';
 import { PublicacaoResquestDTO } from '../dto/publicacaoRequestDTO';
-import { EditarPublicacaoDTO } from '../dto/editarPublicacaoDTO';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { DOCUMENT, ViewportScroller } from '@angular/common';
+import { AuthService } from '../login/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -16,12 +22,11 @@ import { DOCUMENT, ViewportScroller } from '@angular/common';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
-
   private eventSource!: EventSource;
 
   private sseSubscription!: Subscription;
 
-  publicacaoForm!: FormGroup; 
+  publicacaoForm!: FormGroup;
   items: any[];
   images = [{}];
   publicacoes!: PublicacaoResponseDTO[];
@@ -34,7 +39,7 @@ export class HomeComponent implements OnInit {
   imagensRetornadaStorage!: ImagemDTO[];
   msgs = [{}];
   isEditando = false;
-  header = "Nova Postagem"
+  header = 'Nova Postagem';
   idItemEditado!: number;
   showFullText = false;
   notification = false;
@@ -51,7 +56,8 @@ export class HomeComponent implements OnInit {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private viewportScroller: ViewportScroller,
-     @Inject(DOCUMENT) private document: Document
+    private authService: AuthService,
+    @Inject(DOCUMENT) private document: Document
   ) {
     this.publicacaoForm = this.fb.group({
       titulo: ['', Validators.required],
@@ -61,34 +67,45 @@ export class HomeComponent implements OnInit {
     this.buscarTodasPublicacoes();
 
     this.sseSubscription = this.homeService.initSSE().subscribe(
-      data => {
-        if(data){
-          this.notification = true
-        }else{
+      (data) => {
+        if (data) {
+          this.notification = true;
+        } else {
           this.notification = false;
         }
-        this.publicacoes.unshift({...data}); // Atualize o array de mensagens
+        this.publicacoes.unshift({ ...data }); 
         this.cdr.detectChanges();
       },
-      error => {
+      (error) => {
         console.error('Erro na conexão SSE:', error);
       }
     );
 
     this.items = [
-      { label: 'Home', icon: 'pi pi-fw pi-home', routerLink: '/home' },
+      {
+        label: this.authService.getUserName(),
+        icon: 'pi pi-fw pi-home',
+        routerLink: '/home',
+      },
     ];
   }
 
   ngOnDestroy() {
-    this.homeService.closeSSE(); // Feche a conexão SSE ao destruir o componente
-    this.sseSubscription.unsubscribe(); // Desinscreva-se da Observable
+    this.homeService.closeSSE(); 
+    this.sseSubscription.unsubscribe(); 
   }
 
   ngOnInit(): void {
-
     this.mostrarTela = true;
+  }
 
+  verifyCriador(item: PublicacaoResponseDTO): boolean {
+    var userToken = '@' + this.authService.getUserName();
+    if (item.usuario === userToken) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   closeSSE() {
@@ -109,29 +126,28 @@ export class HomeComponent implements OnInit {
   }
 
   atualizarPagina() {
-    // Lógica para atualizar a página
   }
 
   sair() {
     this.router.navigate(['/']);
-
   }
 
   showDialog() {
-    this.isEditando ? this.header = "Editar Postagem" : this.header = "Nova Postagem";
+    this.isEditando
+      ? (this.header = 'Editar Postagem')
+      : (this.header = 'Nova Postagem');
 
     this.displayModal = true;
   }
 
-  // Função para esconder o modal
   hideDialog() {
     this.displayModal = false;
   }
 
   salvarEditarPublicacao() {
-    if(this.isEditando) {
+    if (this.isEditando) {
       this.editarPostagem();
-    }else {
+    } else {
       this.salvarPublicacao();
     }
   }
@@ -140,60 +156,64 @@ export class HomeComponent implements OnInit {
     if (this.publicacaoForm.valid) {
       if (this.uploadedFiles.length != 0) {
         this.enviarImagensStorage(this.uploadedFiles);
-      }else {
-      const descricao = this.publicacaoForm.get('descricao')?.value;
-      const titulo = this.publicacaoForm.get('titulo')?.value;
+      } else {
+        const descricao = this.publicacaoForm.get('descricao')?.value;
+        const titulo = this.publicacaoForm.get('titulo')?.value;
 
-      const enviarPublicacao: PublicacaoResquestDTO = {
-        descricao: descricao,
-        titulo: titulo,
-        imagens: this.imagensRetornadaStorage
-      };
+        const enviarPublicacao: PublicacaoResquestDTO = {
+          descricao: descricao,
+          titulo: titulo,
+          imagens: this.imagensRetornadaStorage,
+        };
 
-      this.homeService.salvarPublicacao(enviarPublicacao).subscribe(
-        (data) => {
-          this.publicacaoForm.reset();
-          this.hideDialog();
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Postagem incluida.' });
-            this.messageService.clear();  
-        },
-        (error) => {}
-      );
-      
-      
+        this.homeService.salvarPublicacao(enviarPublicacao).subscribe(
+          (data) => {
+            this.publicacaoForm.reset();
+            this.hideDialog();
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Postagem incluida.',
+            });
+            this.messageService.clear();
+          },
+          (error) => {}
+        );
+      }
     }
-    } 
   }
 
   enviarImagensStorage(event: any): void {
     const files: File[] = event;
-  
+
     if (files.length > 0) {
       this.storageService.uploadImagens(files).subscribe(
         (response) => {
           this.imagensRetornadaStorage = response;
-  
+
           const descricao = this.publicacaoForm.get('descricao')?.value;
           const titulo = this.publicacaoForm.get('titulo')?.value;
 
           const enviarPublicacao: PublicacaoResquestDTO = {
             descricao: descricao,
             titulo: titulo,
-            imagens: this.imagensRetornadaStorage
+            imagens: this.imagensRetornadaStorage,
           };
-  
-  
+
           this.homeService.salvarPublicacao(enviarPublicacao).subscribe(
             (data) => {
               this.publicacaoForm.reset();
               this.hideDialog();
-              this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Postagem incluida.' });
-                this.messageService.clear();  
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Postagem incluida.',
+              });
+              this.messageService.clear();
             },
             (error) => {}
           );
-          
-          // Limpar os arquivos depois de fazer o upload
+
           this.uploadedFiles = [];
         },
         (error) => {}
@@ -209,18 +229,23 @@ export class HomeComponent implements OnInit {
   }
 
   excluirPostagem(id: any) {
-      this.homeService.excluirPostagem(id).subscribe((res) => {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Postagem excluida.' });
-
-          this.messageService.clear();  
-
+    this.homeService.excluirPostagem(id).subscribe(
+      (res) => {
+        this.messageService.clear();
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Postagem excluida.',
+        });
       },
       (error) => {}
-      )
+    );
   }
 
   editarPostagem(): void {
-
     const descricao = this.publicacaoForm.get('descricao')?.value;
     const titulo = this.publicacaoForm.get('titulo')?.value;
 
@@ -232,10 +257,17 @@ export class HomeComponent implements OnInit {
 
     this.homeService.editarPublicacao(enviarPublicacao).subscribe(
       (response) => {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Postagem atualizada.' });
-
-          this.messageService.clear();  
-          this.publicacaoForm.reset();
+        this.hideDialog();
+        this.messageService.clear();
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Postagem atualizada.',
+        });
+        this.publicacaoForm.reset();
       },
       (error) => {
         console.error('Erro ao atualizar publicação:', error);
@@ -248,7 +280,7 @@ export class HomeComponent implements OnInit {
     this.idItemEditado = publicacao.id;
     const valoresIniciais = {
       descricao: publicacao.descricao,
-      titulo: publicacao.titulo
+      titulo: publicacao.titulo,
     };
     this.publicacaoForm.patchValue(valoresIniciais);
     this.showDialog();
@@ -256,12 +288,16 @@ export class HomeComponent implements OnInit {
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
-    this.alturaTopoTela = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
-    
-    if(this.alturaTopoTela < 100) {
+    this.alturaTopoTela =
+      window.scrollY ||
+      document.documentElement.scrollTop ||
+      document.body.scrollTop ||
+      0;
+
+    if (this.alturaTopoTela < 100) {
       this.scroll = false;
       this.notification = false;
-    }else {
+    } else {
       this.scroll = true;
     }
   }
@@ -270,5 +306,4 @@ export class HomeComponent implements OnInit {
     this.viewportScroller.scrollToPosition([0, 0]);
     this.notification = false;
   }
-
 }

@@ -7,10 +7,9 @@ import { MessageService } from 'primeng-lts/api';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
-
   loginForm!: FormGroup;
   isCadastrar = false;
   msgs = [{}];
@@ -20,24 +19,22 @@ export class LoginComponent implements OnInit {
     private loginService: LoginService,
     private router: Router,
     private messageService: MessageService
-    ) {}
+  ) {}
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
       login: ['', Validators.required],
-      password: ['', Validators.required]
+      password: ['', Validators.required],
     });
   }
 
   onSubmit() {
     if (this.loginForm.valid) {
-
-      if(!this.isCadastrar){
-        this.chamadaLogin()
-      }else {
-        this.chamadaCadastrar()
+      if (!this.isCadastrar) {
+        this.chamadaLogin();
+      } else {
+        this.chamadaCadastrar();
       }
-
     }
   }
 
@@ -48,10 +45,14 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['/home']);
       },
       (error) => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Credenciais inválidas.' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Credenciais inválidas.',
+        });
 
         setTimeout(() => {
-          this.messageService.clear();  
+          this.messageService.clear();
         }, 3000);
       }
     );
@@ -62,17 +63,25 @@ export class LoginComponent implements OnInit {
     this.loginService.cadastrar(authenticationData).subscribe(
       (response) => {
         this.isCadastrar = false;
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Faça login.' });
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Faça login.',
+        });
 
         setTimeout(() => {
-          this.messageService.clear();  
+          this.messageService.clear();
         }, 3000);
       },
       (error) => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Erro ao Cadastrar.' });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Erro ao Cadastrar.',
+        });
 
         setTimeout(() => {
-          this.messageService.clear();  
+          this.messageService.clear();
         }, 3000);
       }
     );

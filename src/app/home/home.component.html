@@ -27,8 +27,8 @@
   <div style="margin-top: 2rem">
     <div class="row" style="gap: 20px; display: flex">
       <div class="col-md-12" *ngFor="let item of publicacoes; let i = index">
-        <p-card 
-        *ngIf="isMostrarCard"
+        <p-card
+          *ngIf="isMostrarCard"
           subheader="{{ item.usuario }}"
           styleClass="p-card-shadow"
           [style]="{ 'border-radius': '20px' }"
@@ -81,7 +81,7 @@
             </p-galleria>
           </div>
 
-          <ng-template pTemplate="footer" *ngIf="item.criador">
+          <ng-template pTemplate="footer" *ngIf="verifyCriador(item)">
             <img
               src="assets/editar.png"
               alt="Editar"
@@ -163,22 +163,28 @@
     type="button"
     (click)="showDialog()"
     class="p-button-rounded p-button-success"
-    style="position: fixed; bottom: 20px; right: 20px; width: 3.7rem;"
-  >+</button>
+    style="position: fixed; bottom: 20px; right: 20px; width: 3.7rem"
+  >
+    +
+  </button>
   <button
     pButton
     type="button"
     (click)="sair()"
     class="p-button-rounded p-button-danger"
-    style="position: fixed; bottom: 80px; right: 20px; width: 3.7rem;"
-  >Sair</button>
+    style="position: fixed; bottom: 80px; right: 20px; width: 3.7rem"
+  >
+    Sair
+  </button>
 
   <button
-  *ngIf="notification && scroll"
-  pButton
-  type="button"
-  (click)="atualizarPublicacoes()"
-  class="p-button-rounded p-button-primary"
-  style="position: fixed; bottom: 80px; left: 20px; width: 10rem;"
->Nova Publicação</button>
+    *ngIf="notification && scroll"
+    pButton
+    type="button"
+    (click)="atualizarPublicacoes()"
+    class="p-button-rounded p-button-primary"
+    style="position: fixed; bottom: 80px; left: 20px; width: 10rem"
+  >
+    Nova Publicação
+  </button>
 </div>

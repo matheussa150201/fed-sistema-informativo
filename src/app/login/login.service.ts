@@ -8,7 +8,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root',
 })
 export class LoginService {
-  private apiUrl = 'http://localhost:8080/sistema-informativo/auth';
+  private apiUrl = 'https://sistema-informativo-production.up.railway.app/sistema-informativo/auth';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
