@@ -1,7 +1,7 @@
 [build]
   environment = { NODE_VERSION = "14" }
   command="ng build"
-  publish="dist/angular-quickstart"
+  publish="dist/fed-sistema-informativo"
 
 [[redirects]]
   from = "/*"
