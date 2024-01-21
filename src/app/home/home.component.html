@@ -1,0 +1,184 @@
+<p-messages [(value)]="msgs" class="message" styleClass="p-mr-2"></p-messages>
+
+<p-menubar [model]="items">
+  <ng-template pTemplate="start">
+    <img
+      src="assets/user.png"
+      height="40"
+      class="p-d-inline-block p-mr-2 p-rounded-circle"
+      alt=""
+    />
+  </ng-template>
+</p-menubar>
+<div class="container" *ngIf="mostrarTela">
+  <div
+    *ngIf="publicacoes.length == 0"
+    style="
+      font-family: cursive;
+      text-align: center;
+      color: purple;
+      padding: 20px;
+    "
+  >
+    <h2>Olá</h2>
+    <h2>Faça uma nova postagem!</h2>
+  </div>
+
+  <div style="margin-top: 2rem">
+    <div class="row" style="gap: 20px; display: flex">
+      <div class="col-md-12" *ngFor="let item of publicacoes; let i = index">
+        <p-card 
+        *ngIf="isMostrarCard"
+          subheader="{{ item.usuario }}"
+          styleClass="p-card-shadow"
+          [style]="{ 'border-radius': '20px' }"
+        >
+          <h3>{{ item.titulo }}</h3>
+
+          <div
+            class="text-container"
+            [ngClass]="{ 'full-text': item.showFullText }"
+          >
+            {{ item.descricao }}
+          </div>
+          <a
+            style="color: blue; cursor: pointer"
+            *ngIf="!item.showFullText && item.descricao.length > 200"
+            (click)="toggleText(item)"
+            >...ver mais</a
+          >
+          <a
+            style="color: rgb(255, 0, 0); cursor: pointer"
+            *ngIf="item.showFullText"
+            (click)="toggleText(item)"
+            >...ver menos</a
+          >
+
+          <div
+            style="width: 100%; background-color: rgb(0, 0, 0)"
+            *ngIf="item.imagens.length > 0"
+          >
+            <p-galleria [numVisible]="3" [value]="item.imagens">
+              <ng-template pTemplate="item" let-item>
+                <img
+                  [src]="item.url"
+                  [alt]="item.alt"
+                  [title]="item.nome"
+                  style="width: 50%"
+                />
+              </ng-template>
+
+              <ng-template pTemplate="thumbnail" let-item width="50%">
+                <div class="grid">
+                  <img
+                    [src]="item.url"
+                    [alt]="item.alt"
+                    [title]="item.nome"
+                    width="20%"
+                  />
+                </div>
+              </ng-template>
+            </p-galleria>
+          </div>
+
+          <ng-template pTemplate="footer" *ngIf="item.criador">
+            <img
+              src="assets/editar.png"
+              alt="Editar"
+              (click)="abrirModalEditar(item)"
+              style="cursor: pointer; width: 1rem"
+            />
+            <img
+              src="assets/lixeiraa.png"
+              alt="Excluir"
+              (click)="excluirPostagem(item.id)"
+              style="cursor: pointer; width: 1rem; margin-left: 2rem"
+            />
+          </ng-template>
+        </p-card>
+      </div>
+    </div>
+  </div>
+
+  <p-dialog
+    [header]="header"
+    [(visible)]="displayModal"
+    [modal]="true"
+    [responsive]="true"
+  >
+    <div class="modal-body">
+      <form [formGroup]="publicacaoForm">
+        <div class="p-fluid custom-input">
+          <div class="p-field input label-info">
+            <label for="titulo" class="font">Titulo:</label>
+            <input type="text" pInputText formControlName="titulo" />
+          </div>
+
+          <div class="p-field input label-info" style="margin-top: 1rem">
+            <label for="descricao" class="font">Descricao:</label>
+            <input type="text" pInputText formControlName="descricao" />
+          </div>
+
+          <p-fileUpload
+            *ngIf="!isEditando"
+            [style]="{ 'margin-top': '1rem' }"
+            [multiple]="true"
+            accept="image/*"
+            [maxFileSize]="maxFileSize"
+            [fileLimit]="fileLimit"
+            [showUploadButton]="false"
+            [chooseLabel]="chooseLabel"
+            (onSelect)="onFileSelect($event)"
+          >
+            <ng-template pTemplate="content">
+              <ul *ngIf="uploadedFiles.length">
+                <li *ngFor="let file of uploadedFiles">
+                  {{ file.name }} - {{ file.size }} bytes
+                </li>
+              </ul>
+            </ng-template>
+          </p-fileUpload>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <img
+        src="assets/salvar.png"
+        alt="Salvar"
+        (click)="salvarEditarPublicacao()"
+        style="cursor: pointer; width: 1rem"
+      />
+      <img
+        src="assets/fechar.png"
+        alt="fechar"
+        (click)="hideDialog()"
+        style="cursor: pointer; width: 1rem; margin-left: 2rem"
+      />
+    </div>
+  </p-dialog>
+
+  <button
+    pButton
+    type="button"
+    (click)="showDialog()"
+    class="p-button-rounded p-button-success"
+    style="position: fixed; bottom: 20px; right: 20px; width: 3.7rem;"
+  >+</button>
+  <button
+    pButton
+    type="button"
+    (click)="sair()"
+    class="p-button-rounded p-button-danger"
+    style="position: fixed; bottom: 80px; right: 20px; width: 3.7rem;"
+  >Sair</button>
+
+  <button
+  *ngIf="notification && scroll"
+  pButton
+  type="button"
+  (click)="atualizarPublicacoes()"
+  class="p-button-rounded p-button-primary"
+  style="position: fixed; bottom: 80px; left: 20px; width: 10rem;"
+>Nova Publicação</button>
+</div>

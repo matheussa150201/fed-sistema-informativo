@@ -1,0 +1,26 @@
+.navBarUt{
+}
+
+.message {
+    position: fixed;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.text-container {
+  font-size: 14px; 
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.full-text {
+  font-size: 16px; 
+  white-space: normal;
+}
+
+.ver-mais {
+    color: #00a6ff; 
+    cursor: pointer;
+}
+

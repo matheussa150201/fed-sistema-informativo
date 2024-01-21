@@ -1,0 +1,51 @@
+.container-todo{
+  margin-top: 1rem;
+}
+
+.titulo{
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.input{
+  border-radius: 15px;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.font{
+  font-family: revert;
+}
+
+.label-info{
+  font-size: small;
+}
+
+.custom-input {
+  .p-inputtext {
+    &:focus {
+      border-color: a36ed5; 
+      box-shadow: 0 0 0 0.2rem rgba(107, 0, 107, 0.25); 
+    }
+  }
+}
+
+.logo{
+  font-family: cursive;
+  color: #6B21AB;
+}
+
+.logo-div{
+  margin-top: 1rem;
+}
+
+.p-card {
+  border-radius: 15px;
+}
+
+.message {
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
